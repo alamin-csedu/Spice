@@ -1,0 +1,38 @@
+﻿@model Spice.Models.Category
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Update Category</h1>
+
+<hr />
+<br />
+<br />
+<div class="row rounded bg-white p-3 ">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label font-weight-bold"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="row ">
+                <div class="form-group col-6">
+                    <input  type="submit" value="Edit" class="btn btn-block btn-primary" />
+                </div>
+                <div class="col-6 text-right">
+                    <a class="btn btn-block btn-success" asp-action="Index">Back to List</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
