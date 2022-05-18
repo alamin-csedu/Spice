@@ -1,8 +1,73 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Spice.Models.ViewModels.IndexViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<br />
+
+<div style="margin-left:180px; margin-right:180px">
+
+    @if (Model.Coupons.ToList().Count > 0)
+    {
+
+        <div class="carousel" data-ride="carousel" data-interval="1500">
+            @for (int i = 0; i < Model.Coupons.Count(); i++)
+            {
+                if (i == 0)
+                {
+
+
+                    <div style="border-radius:10px" class="  carousel-item active border-0 bg-secondary p-2">
+                        @{
+                            <h3 style="text-align:center">$@Model.Coupons.ToList()[i].Discount OFF ANY PURCHASE OVER $@Model.Coupons.ToList()[i].MinimumAmount</h3>
+
+                        }
+
+
+                    </div>
+                }
+                else
+                {
+        <div style="border-radius:10px" class="carousel-item border-0 bg-secondary p-2">
+            @{
+
+                <h3 style="text-align:center">$@Model.Coupons.ToList()[i].Discount OFF ANY PURCHASE OVER $@Model.Coupons.ToList()[i].MinimumAmount</h3>
+
+            }
+
+
+
+        </div>
+                }
+            }
+        </div>
+
+    }
+
 </div>
+
+<br /> <br />
+
+<div style="margin-top:50px" class="bg-white container">
+
+    <div>
+        <ul id="menu-filters" class="menu-filter-list list-inline text-center pt-5 ">
+            <li class="filer active btn btn-secondary mr-1 ml-1 " data-filter="menu-restaurent" >Show All</li>
+            @foreach (var item in Model.Categories)
+            {
+                <li class="btn btn-secondary text-dark" data-filter="@item.Name.Replace(" ",string.Empty)" >@item.Name</li>
+            }
+        </ul>
+
+    </div>
+
+    @foreach(var category in Model.Categories)
+            {
+                <div class="row" id="menu-wrapper" style="margin:10px">
+                    <partial name="_Thumbnail" model="@Model.MenuItems.Where(m => m.Category.Name.Equals(category.Name))" />
+                </div>
+            }
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" 
+        crossorigin="anonymous">
+
+</script>

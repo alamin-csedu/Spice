@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -55,10 +56,25 @@ namespace Spice.Areas.Admin.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CouponType,Discount,MinimumAmount,Picture,isActive")] Coupon coupon)
+        public async Task<IActionResult> Create([FromForm]Coupon coupon)
         {
             if (ModelState.IsValid)
             {
+                var files = HttpContext.Request.Form.Files;
+                if(files.Count()> 0)
+                {
+                    byte[] picture = null;
+                    using(var fs1 = files[0].OpenReadStream())
+                    {
+                        using(var ms1 = new MemoryStream())
+                        {
+                            fs1.CopyTo(ms1);
+                            picture = ms1.ToArray();
+                        }
+                    }
+
+                    coupon.Picture = picture;
+                }
                 _context.Add(coupon);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

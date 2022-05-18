@@ -4,11 +4,11 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
-
-<h4>Coupon</h4>
+<h1>Update Coupon</h1>
 <hr />
-<div class="row">
+<br />
+<br />
+<div class="row rounded bg-white p-3 ">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -34,25 +34,28 @@
                 <span asp-validation-for="MinimumAmount" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <img src="@Model.Picture" width="100%" style="border-radius: 10px" />
                 <label asp-for="Picture" class="control-label"></label>
-                <input asp-for="Picture" class="form-control" />
-                <span asp-validation-for="Picture" class="text-danger"></span>
+                <input type="file" asp-for="Picture" class="form-control"></input>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
                 </label>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="row ">
+                <div class="form-group col-6">
+                    <input type="submit" value="Edit" class="btn btn-block btn-primary" />
+                </div>
+                <div class="col-6 text-right">
+                    <a class="btn btn-block btn-success" asp-action="Index">Back to List</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

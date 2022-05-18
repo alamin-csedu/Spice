@@ -8,53 +8,54 @@
 
 <h4>Coupon</h4>
 <hr />
-<div class="row rounded bg-white p-3 ">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CouponType" class="control-label"></label>
-                <input asp-for="CouponType" class="form-control" />
-                <span asp-validation-for="CouponType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Discount" class="control-label"></label>
-                <input asp-for="Discount" class="form-control" />
-                <span asp-validation-for="Discount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MinimumAmount" class="control-label"></label>
-                <input asp-for="MinimumAmount" class="form-control" />
-                <span asp-validation-for="MinimumAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Picture" class="control-label"></label>
-                <input asp-for="Picture" class="form-control" />
-                <span asp-validation-for="Picture" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
-                </label>
-            </div>
-            <div class="row">
-                <div class="form-group col-6">
-                    <input type="submit" value="Create" class="btn btn-primary btn-block" />
+<form method="post" enctype="multipart/form-data">
+    <div class="row rounded bg-white p-3 ">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
-                <div class="col-6">
-                    <a class="btn btn-success btn-block" asp-action="Index">Back to List</a>
+                <div class="form-group">
+                    <label asp-for="CouponType" class="control-label"></label>
+                    <select asp-for="CouponType" asp-items="@Html.GetEnumSelectList<Coupon.ECouponType>()" class="form-control"></select>
+                    <span asp-validation-for="CouponType" class="text-danger"></span>
                 </div>
-            </div>
-        </form>
+                <div class="form-group">
+                    <label asp-for="Discount" class="control-label"></label>
+                    <input asp-for="Discount" class="form-control" />
+                    <span asp-validation-for="Discount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MinimumAmount" class="control-label"></label>
+                    <input asp-for="MinimumAmount" class="form-control" />
+                    <span asp-validation-for="MinimumAmount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Picture" class="col-form-label"></label>
+                    <input type="file" name="files" multiple class="form-control"></input>
+
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <input type="submit" value="Create" class="btn btn-primary btn-block" />
+                    </div>
+                    <div class="col-6">
+                        <a class="btn btn-success btn-block" asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</form>
 
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

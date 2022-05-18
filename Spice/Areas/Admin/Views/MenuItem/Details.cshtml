@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Details</h1>
 
 <h4>Menu Item</h4>
 <hr />
@@ -48,7 +48,8 @@
                     <span asp-validation-for="MenuItem.SubCategoryId" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="MenuItem.Image" class="col-form-label"></label>
+                    <img src="@Model.MenuItem.Image" width="100%" style="border-radius: 10px" />
+                    <label asp-for="MenuItem.Image" class="control-label"></label>
                     <input type="file" name="files" multiple class="form-control"></input>
 
                 </div>
@@ -66,13 +67,15 @@
 
 </form>
 
+
 @section Scripts{
 
     <script>
         tinymce.init({
             selector: 'textarea',
             plugins: 'lists',
-            menubar: 'file edit format'
+            menubar: 'file edit format',
+            readonly: 1
         });
 
         $(document).ready(function () {
@@ -94,5 +97,8 @@
                 $('#SubCategoryId').html(items);
             })
         }
+        $(function () {
+            $('input, select, textarea').attr('disabled', 'disabled');
+        });
     </script>
 }

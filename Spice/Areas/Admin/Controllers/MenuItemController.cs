@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Spice.Data;
 using Spice.Models.ViewModels;
+using Spice.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
@@ -36,17 +39,14 @@ namespace Spice.Areas.Admin.Controllers
         // GET: MenuItemController
         public async Task<IActionResult> Index()
         {
-            List<String> input = new List<string>(){
-                "Alamin", "Tamim", "Abir", "Jewel", "Monir" };
-            ViewBag.input = input;
-           // var menuItem = context.MenuItemTb.Include(m => m.Category).Include(p => p.SubCategory).ToListAsync();
             return View(await context.MenuItemTb.Include(m => m.Category).Include(p => p.SubCategory).ToListAsync());
         }
 
         // GET: MenuItemController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            return View();
+            MenuItemVM.MenuItem = await context.MenuItemTb.Include(p => p.Category).Include(s => s.SubCategory).FirstAsync(q => q.Id == id);
+            return View(MenuItemVM);
         }
 
         // GET: MenuItemController/Create
@@ -58,58 +58,145 @@ namespace Spice.Areas.Admin.Controllers
         // POST: MenuItemController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async  Task<ActionResult> Create(int i)
         {
-            try
+            MenuItemVM.MenuItem.SubCategoryId = Convert.ToInt32(Request.Form["SubCategoryId"].ToString());
+           await context.MenuItemTb.AddAsync(MenuItemVM.MenuItem);
+           await context.SaveChangesAsync();
+
+            string webRootPath = hostingEnvironment.WebRootPath;
+            var files = HttpContext.Request.Form.Files;
+
+            var menuItemFromDb = await context.MenuItemTb.FindAsync(MenuItemVM.MenuItem.Id);
+
+            if (files.Count() > 0)
             {
-                return RedirectToAction(nameof(Index));
+                var uploads = Path.Combine(webRootPath, "images");
+                var extension = Path.GetExtension(files[0].FileName);
+
+                using (var fileStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension), FileMode.Create))
+                {
+                    files[0].CopyTo(fileStream);
+                }
+                menuItemFromDb.Image = @"/images/" + MenuItemVM.MenuItem.Id + extension;
+
+
             }
-            catch
+            else
             {
-                return View();
+                var uploads = Path.Combine(webRootPath, @"/images/"+SD.DefaultFoodImage);
+                System.IO.File.Copy(@"/images/" + MenuItemVM.MenuItem.Id + ".png", uploads);
+                menuItemFromDb.Image = @"/images/" + MenuItemVM.MenuItem.Id + ".png";
+
             }
+
+           await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+            
         }
 
         // GET: MenuItemController/Edit/5
-        public ActionResult Edit(int id)
+        public async  Task<ActionResult> Edit(int id)
         {
-            return View();
+            MenuItemVM.MenuItem = await context.MenuItemTb.Include(m => m.Category).Include(p => p.SubCategory).SingleOrDefaultAsync(c => c.Id== id);
+          
+            if (id == null)
+            {
+                return NotFound();
+            }
+          
+            return View(MenuItemVM);
         }
 
         // POST: MenuItemController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, IFormCollection collection)
         {
-            try
+            if (id == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+            MenuItemVM.MenuItem.SubCategoryId = Convert.ToInt32(Request.Form["SubCategoryId"].ToString());
+
+            if (!ModelState.IsValid)
             {
-                return View();
+                MenuItemVM.SubCategories = await context.SubCategoryTb.Where(s => s.CategoryId == MenuItemVM.MenuItem.CategoryId).ToListAsync();
+                return View(MenuItemVM);
             }
+
+            //Work on the image saving section
+
+            string webRootPath = hostingEnvironment.WebRootPath;
+            var files = HttpContext.Request.Form.Files;
+
+            var menuItemFromDb = await context.MenuItemTb.FindAsync(MenuItemVM.MenuItem.Id);
+
+            if (files.Count > 0)
+            {
+                //New Image has been uploaded
+                var uploads = Path.Combine(webRootPath, "images");
+                var extension_new = Path.GetExtension(files[0].FileName);
+
+                //Delete the original file
+                var imagePath = Path.Combine(webRootPath, menuItemFromDb.Image.TrimStart('\\'));
+
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                //we will upload the new file
+                using (var filesStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_new), FileMode.Create))
+                {
+                    files[0].CopyTo(filesStream);
+                }
+                menuItemFromDb.Image = @"\images\" + MenuItemVM.MenuItem.Id + extension_new;
+            }
+
+            menuItemFromDb.Name = MenuItemVM.MenuItem.Name;
+            menuItemFromDb.Description = MenuItemVM.MenuItem.Description;
+            menuItemFromDb.Price = MenuItemVM.MenuItem.Price;
+            menuItemFromDb.Spicyness = MenuItemVM.MenuItem.Spicyness;
+            menuItemFromDb.CategoryId = MenuItemVM.MenuItem.CategoryId;
+            menuItemFromDb.SubCategoryId = MenuItemVM.MenuItem.SubCategoryId;
+
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: MenuItemController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            MenuItemVM.MenuItem  = await context.MenuItemTb.Include(p => p.Category).Include(s => s.SubCategory).FirstAsync(q => q.Id == id);
+            return View(MenuItemVM.MenuItem);
         }
 
         // POST: MenuItemController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
-            try
+            string webRootPath = hostingEnvironment.WebRootPath;
+            var menuItemFromDb = await context.MenuItemTb.FindAsync(id);
+            var imageURL = menuItemFromDb.Image;
+            if(imageURL != null)
             {
-                return RedirectToAction(nameof(Index));
+                var imagePath = webRootPath + imageURL;
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+
+            context.MenuItemTb.RemoveRange(menuItemFromDb);
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+
         }
     }
 }
