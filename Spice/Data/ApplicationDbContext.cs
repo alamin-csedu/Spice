@@ -18,6 +18,11 @@ namespace Spice.Data
         public DbSet<SubCategory> SubCategoryTb { get; set; }
         public DbSet<MenuItem> MenuItemTb { get; set; }
         public DbSet<Coupon> CouponTb { get; set; }
+        public DbSet<ApplicationUser> ApplicationUserTb { get; set; }
+
+        public DbSet<ShoppingCart> ShoppingCartTb { get; set; }
+        public DbSet<OrderHeader> OrderHeaderTb { get; set; }
+        public DbSet<OrderDetails> OrderDetailsTb { get; set; }
 
         internal Task FindAsync(int id)
         {

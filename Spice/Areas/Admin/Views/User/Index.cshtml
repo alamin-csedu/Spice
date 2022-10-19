@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Spice.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="container border m-5 background-white">
+    <div class="row m-4 p-2">
+        <div class="col-9">
+            <h1>Employee List</h1>
+        </div>
+        <div class="col-3 align-middle">
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-plus"></i> &nbsp; Create New Employee</a>
+
+        </div>
+    </div>
+
+    <div class="border m-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <h4 class="font-weight-bold "> @Html.DisplayNameFor(model => model.Name)</h4>
+                    </th>
+                    <th>
+                        <h4 class="font-weight-bold "> @Html.DisplayNameFor(model => model.Email)</h4>
+                    </th>
+                    <th>
+                        <h4 class="font-weight-bold "> @Html.DisplayNameFor(model => model.State)</h4>
+                    </th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        <p class="font-weight-bold"> @Html.DisplayFor(modelItem => item.Name)</p>
+                    </td>
+                    <td>
+                        <p class="font-weight-bold"> @Html.DisplayFor(modelItem => item.Email)</p>
+                    </td>
+                    <td>
+                        <p class="font-weight-bold"> @Html.DisplayFor(modelItem => item.State)</p>
+                    </td>
+                    <td class="text-right">
+
+                        @if (item.LockoutEnd == null || item.LockoutEnd < DateTime.Now)
+                        {
+                            <a class="btn btn-success text-white" asp-action="Lock" asp-route-id="@item.Id">
+                                <i class="fas fa-lock-open"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-danger text-white" asp-action="UnLock" asp-route-id="@item.Id">
+                                <i class="fas fa-lock"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

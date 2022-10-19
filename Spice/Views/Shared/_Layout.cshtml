@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Spice.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor IHttpContextAccessor
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,12 +10,20 @@
     <script src="https://kit.fontawesome.com/5c01108705.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.css">
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-dark border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index">Spice</a>
+
+                <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/mild.png" />
+                    <img src="~/images/spicy.png" />
+                    <img src="~/images/verySpicy.png" />
+                    <label class="text-info" style="cursor:pointer">Spice </label>
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,24 +31,65 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item dropdown text-white">
-                            <a class="nav-link dropdown-toggle text-white-50 " href="#" id="NavBarDropdownLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Content Management
-                            </a>
-                            <div class="dropdown-menu" aria-lebelledby="NavBarDropdownLink">
-                                <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="Category">Category</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="SubCategory">Sub-Category</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="MenuItem">Menu Items</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="Coupon">Coupon</a>
-                                <a class="dropdown-item">Users</a>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsInRole(SD.ManagerUser))
+                        {
+                            <li class="nav-item dropdown text-white">
+                                <a class="nav-link dropdown-toggle text-white-50 " href="#" id="NavBarDropdownLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Content Management
+                                </a>
+                                <div class="dropdown-menu" aria-lebelledby="NavBarDropdownLink">
+                                    <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="Category">Category</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="SubCategory">Sub-Category</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="MenuItem">Menu Items</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="Coupon">Coupon</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-action="Index" asp-controller="User">User</a>
+
+                                </div>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(SD.CustomerUser) | User.IsInRole(SD.ManagerUser))
+                        {
+                            <li>
+                                <a style="color:white" asp-area="Customer" asp-controller="Order" asp-action="OrderHistory" class="nav-link">
+                                    Order History
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(SD.ManagerUser) | User.IsInRole(SD.KitchenUser))
+                        {
+                            <li class="nav-item dropdown text-white">
+                                <a class="nav-link dropdown-toggle text-white-50 " href="#" id="NavBarDropdownLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                   Order
+                                </a>
+                                <div class="dropdown-menu" aria-lebelledby="NavBarDropdownLink">
+                                    @if (User.IsInRole(SD.ManagerUser) | User.IsInRole(SD.KitchenUser))
+                                    {
+                                        <a class="dropdown-item" asp-area="Customer" asp-action="ManageOrder" asp-controller="Order">Manage Order</a>
+
+                                    }
+                                    @if (User.IsInRole(SD.ManagerUser) | User.IsInRole(SD.CustomerUser))
+                                    {
+                                        <a class="dropdown-item" asp-area="Customer" asp-action="OrderPickup" asp-controller="Order">Order Pickup</a>
+                                     }
+
+
+                                </div>
+                            </li>
+                        }
+                        @if (IHttpContextAccessor.HttpContext.Session.GetInt32("ssCartCount") != null)
+                        {
+                            var count = IHttpContextAccessor.HttpContext.Session.GetInt32("ssCartCount").Value;
+                            <li>
+                                <a style="color:white" asp-area="Customer" asp-controller="Cart" asp-action="Index" class="nav-link">
+                                    <i style="color:white" class="fas fa-shopping-cart"></i> &nbsp;(@count)
+                                </a>
+                            </li>
+                        }
+
+
+
                     </ul>
                 </div>
             </div>
@@ -58,6 +110,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jquery-ui.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
